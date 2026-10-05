@@ -50,6 +50,11 @@ class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
         ];
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
     /**
      * Get the user's initials
      */

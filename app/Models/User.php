@@ -30,7 +30,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password','status'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
 {
@@ -53,6 +53,23 @@ class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return $this->activeSubscription()->exists();
+    }
+
+    public function currentSubscription(): ?Subscription
+    {
+        return $this->activeSubscription;
+    }
+
+    public function subscriptionIsExpired(): bool
+    {
+        return $this->subscriptions()
+            ->where('status', 'expired')
+            ->exists();
     }
 
     /**

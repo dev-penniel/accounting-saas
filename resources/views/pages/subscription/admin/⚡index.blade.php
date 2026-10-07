@@ -156,7 +156,7 @@ new class extends Component
                 title: 'Subscription Rejected',
                 message: 'Your proof of payment was rejected. Please contact support or submit a new payment proof.',
                 type: 'error',
-                url: route('subscription'),
+                url: route('checkout'),
             )
         );
 

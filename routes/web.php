@@ -12,6 +12,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::livewire('/contacts', 'pages::contacts.index' )->name('contacts');
     Route::livewire('/notifications', 'pages::notifications.index' )->name('notifications');
+    Route::livewire('/checkout', 'pages::subscription.checkout' )->name('checkout');
 
     Route::livewire('/roles', 'pages::roles.index' )->name('roles');
     Route::livewire('/roles/create', 'pages::roles.create' )->name('roles.create');
@@ -20,7 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/users', 'pages::users.index' )->name('users')->middleware('permission:access-users');
     Route::livewire('/users/create', 'pages::users.create' )->name('users.create')->middleware('permission:create-users');
     Route::livewire('/user/{id}', 'pages::users.edit' )->name('user.edit')->middleware('permission:edit-users');
-    
+
 });
 
 

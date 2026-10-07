@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\WithFileUploads;
+use App\Models\User;
+use App\Notifications\SystemNotification;
+
 
 new class extends \Livewire\Component
 {
@@ -81,6 +84,21 @@ new class extends \Livewire\Component
         );
 
         $this->reset('proofOfPayment');
+
+        // Notifications to all general admins
+
+        $admins = User::role('General Admin')->get();
+
+        foreach ($admins as $admin) {
+            $admin->notify(
+                new SystemNotification(
+                    title: 'New Subscription Request',
+                    message: "{$user->name} submitted proof of payment for a {$this->plan} subscription.",
+                    type: 'success',
+                    url: route('subscriptions'),
+                )
+            );
+        }
 
         unset($this->pendingSubscription);
 

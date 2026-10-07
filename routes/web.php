@@ -14,6 +14,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/notifications', 'pages::notifications.index' )->name('notifications');
     Route::livewire('/checkout', 'pages::subscription.checkout' )->name('checkout');
 
+    Route::livewire('/subscriptions', 'pages::subscription.admin.index' )->name('subscriptions');
+
     Route::livewire('/roles', 'pages::roles.index' )->name('roles');
     Route::livewire('/roles/create', 'pages::roles.create' )->name('roles.create');
     Route::livewire('/role/{id}', 'pages::roles.edit' )->name('roles.edit');

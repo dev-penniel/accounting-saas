@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::livewire('/', 'pages::home')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('dashboard', 'pages::dashboard')->name('dashboard');
@@ -13,6 +13,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/contacts', 'pages::contacts.index' )->name('contacts');
     Route::livewire('/notifications', 'pages::notifications.index' )->name('notifications');
     Route::livewire('/checkout', 'pages::subscription.checkout' )->name('checkout');
+    Route::livewire('/c-notifications', 'pages::client.c-notifications' )->name('c-notifications');
+
 
     Route::livewire('/subscriptions', 'pages::subscription.admin.index' )->name('subscriptions');
 

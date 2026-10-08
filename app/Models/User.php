@@ -20,6 +20,7 @@ use App\Models\Subscription;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+
 /**
  * @property int $id
  * @property string $name
@@ -81,6 +82,22 @@ class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
         return $this->subscriptions()
             ->where('status', 'expired')
             ->exists();
+    }
+
+    // Accounting App
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function openingBalances(): HasMany
+    {
+        return $this->hasMany(OpeningBalance::class);
     }
 
     /**

@@ -51,14 +51,7 @@
                         Subscription
                     </flux:button>
 
-                    <flux:button
-                        href="{{ route('c-notifications') }}"
-                        variant="ghost"
-                        :current="request()->routeIs('c-notifications')"
-                        wire:navigate
-                    >
-                        Notifications
-                    </flux:button>
+                    <livewire:notification-nav-item />
 
                 @else
 

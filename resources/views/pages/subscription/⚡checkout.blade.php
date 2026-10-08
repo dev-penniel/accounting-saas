@@ -7,9 +7,12 @@ use Livewire\Attributes\Computed;
 use Livewire\WithFileUploads;
 use App\Models\User;
 use App\Notifications\SystemNotification;
+use Livewire\Attributes\Layout;
 
 
-new class extends \Livewire\Component
+new
+#[Layout('layouts::app.frontend')]
+class extends \Livewire\Component
 {
     use WithFileUploads;
 

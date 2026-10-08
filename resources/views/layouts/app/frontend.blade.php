@@ -43,6 +43,15 @@
                     </flux:button> --}}
 
                     <flux:button
+                        href="{{ route('subscription') }}"
+                        variant="ghost"
+                        :current="request()->routeIs('subscription')"
+                        wire:navigate
+                    >
+                        Subscription
+                    </flux:button>
+
+                    <flux:button
                         href="{{ route('c-notifications') }}"
                         variant="ghost"
                         :current="request()->routeIs('c-notifications')"
@@ -93,19 +102,37 @@
 
             <div class="flex items-center gap-4">
 
-                <a
-                    href="{{ route('login') }}"
-                    class="transition hover:text-zinc-900 dark:hover:text-white"
-                >
-                    Login
-                </a>
+                @auth
 
-                <a
-                    href="{{ route('register') }}"
-                    class="transition hover:text-zinc-900 dark:hover:text-white"
-                >
-                    Register
-                </a>
+                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                        @csrf
+                        <flux:menu.item
+                            as="button"
+                            type="submit"
+                            icon="arrow-right-start-on-rectangle"
+                            class="w-full cursor-pointer"
+                            data-test="logout-button"
+                        >
+                            {{ __('Log out') }}
+                        </flux:menu.item>
+                    </form>
+                @else
+
+                    <a
+                        href="{{ route('login') }}"
+                        class="transition hover:text-zinc-900 dark:hover:text-white"
+                    >
+                        Login
+                    </a>
+
+                    <a
+                        href="{{ route('register') }}"
+                        class="transition hover:text-zinc-900 dark:hover:text-white"
+                    >
+                        Register
+                    </a>
+
+                @endauth
 
             </div>
 

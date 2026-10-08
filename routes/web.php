@@ -6,7 +6,7 @@ Route::livewire('/', 'pages::home')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    Route::livewire('/checkout', 'pages::subscription.checkout' )->name('checkout');
+    Route::livewire('/subscription', 'pages::subscription.checkout' )->name('subscription');
     Route::livewire('/c-notifications', 'pages::client.c-notifications' )->name('c-notifications');
 
 });

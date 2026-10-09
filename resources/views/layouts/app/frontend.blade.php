@@ -23,7 +23,7 @@
             {{-- Logo --}}
             <a wire:navigate href="{{ route('home') }}" class="flex items-center gap-2">
                 
-                    <img src="/fav.png" alt="" class="w-8">
+                    <img src="/fairview.png" alt="" class="w-8">
 
                 <span class="font-semibold tracking-tight">
                     {{ config('app.name', 'StarterKit') }} 

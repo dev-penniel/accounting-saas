@@ -432,7 +432,7 @@ class extends Component
 
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
 
-            <a href="{{ route('transactions') }}"
+            <a wire:navigate href="{{ route('transactions') }}"
                class="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition hover:border-blue-300 hover:shadow-sm">
                 <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition group-hover:bg-blue-100">
                     <i class="fa-solid fa-plus text-lg"></i>
@@ -447,7 +447,7 @@ class extends Component
                 </span>
             </a>
 
-            <a href="{{ route('transactions') }}"
+            <a wire:navigate href="{{ route('transactions') }}"
                class="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition hover:border-green-300 hover:shadow-sm">
                 <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600 transition group-hover:bg-green-100">
                     <i class="fa-solid fa-list-check text-lg"></i>

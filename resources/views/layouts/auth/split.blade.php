@@ -24,8 +24,14 @@
 
                 <div class="relative z-20 mt-auto">
                     <blockquote class="space-y-2">
-                        <flux:heading class="text-white" size="lg">Penniel Starter Kit</flux:heading>
-                        <footer><flux:heading class="text-white">A perfect start for your next Laravel project. Explore Penniel Kit V.1 and its awesome tools</flux:heading></footer>
+                        <flux:heading class="text-white" size="lg">
+                            Take Control of Your Finances
+                        </flux:heading>
+                        <footer>
+                            <flux:heading class="text-white">
+                                Track every transaction, manage your expenses, and understand your business finances. Make smarter decisions with confidence.
+                            </flux:heading>
+                        </footer>
                     </blockquote>
                 </div>
             </div>

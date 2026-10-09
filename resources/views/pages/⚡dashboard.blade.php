@@ -6,6 +6,14 @@ use Livewire\Component;
 
 new class extends Component
 {
+    // Temporary Fix
+    public function mount()
+    {
+        if (! auth()->user()->hasRole('General Admin')) {
+            $this->redirectRoute('home');
+        }
+    }
+
     #[Computed]
     public function pendingPayments()
     {

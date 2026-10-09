@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::livewire('/', 'pages::home')->name('home');
-
 Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::livewire('/subscription', 'pages::subscription.checkout' )->name('subscription');
@@ -14,6 +12,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified', 'subscription'])->group(function () {
     
     Route::livewire('c-dashboard', 'pages::app.c-dashboard')->name('c-dashboard');
+    Route::livewire('/', 'pages::app.transactions.index')->name('home');
 
 });
 

@@ -9,6 +9,7 @@
 
         @include('partials.head')
 
+        @livewireStyles
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -133,6 +134,8 @@
 
     </footer>
 
+    @livewireScripts
+    @fluxScripts
 </body>
 
 </html>

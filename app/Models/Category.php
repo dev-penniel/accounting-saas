@@ -18,6 +18,7 @@ class Category extends Model
         'type',
         'parent_id',
         'is_default',
+        'default_key',
         'is_hidden',
     ];
 

@@ -8,136 +8,157 @@ use Illuminate\Support\Facades\DB;
 
 class CategoryService
 {
-    /**
-     * The built-in income categories.
-     */
     public function incomeCategories(): array
     {
         return [
-            'Sales of goods',
-            'Service income',
-            'Contract / project income',
-            'Commission',
-            'Interest income',
-            'Other income',
+            'income.sales_of_goods' => 'Sales of goods',
+            'income.service_income' => 'Service income',
+            'income.contract_project' => 'Contract / project income',
+            'income.commission' => 'Commission',
+            'income.interest_income' => 'Interest income',
+            'income.other_income' => 'Other income',
         ];
     }
 
-    /**
-     * Built-in expense groups and their subcategories.
-     */
     public function expenseCategories(): array
     {
         return [
-            'Premises & occupancy' => [
-                'Rent',
-                'Utilities (electricity, water, gas)',
-                'Insurance (premises)',
-                'Repairs & maintenance',
-                'Cleaning & security',
+            'expense.premises_occupancy' => [
+                'name' => 'Premises & occupancy',
+                'children' => [
+                    'rent' => 'Rent',
+                    'utilities' => 'Utilities (electricity, water, gas)',
+                    'premises_insurance' => 'Insurance (premises)',
+                    'repairs_maintenance' => 'Repairs & maintenance',
+                    'cleaning_security' => 'Cleaning & security',
+                ],
             ],
 
-            'Staff & labour' => [
-                'Wages & salaries',
-                'Contractor / casual labour',
-                'Staff benefits & allowances',
-                'Training',
+            'expense.staff_labour' => [
+                'name' => 'Staff & labour',
+                'children' => [
+                    'wages_salaries' => 'Wages & salaries',
+                    'contractor_casual_labour' => 'Contractor / casual labour',
+                    'staff_benefits_allowances' => 'Staff benefits & allowances',
+                    'training' => 'Training',
+                ],
             ],
 
-            'Operations & supplies' => [
-                'Stock / inventory purchases',
-                'Raw materials',
-                'Tools & equipment',
-                'Packaging & consumables',
-                'Office supplies',
+            'expense.operations_supplies' => [
+                'name' => 'Operations & supplies',
+                'children' => [
+                    'stock_purchases' => 'Stock / inventory purchases',
+                    'raw_materials' => 'Raw materials',
+                    'tools_equipment' => 'Tools & equipment',
+                    'packaging_consumables' => 'Packaging & consumables',
+                    'office_supplies' => 'Office supplies',
+                ],
             ],
 
-            'Vehicles & travel' => [
-                'Fuel',
-                'Vehicle repairs & maintenance',
-                'Vehicle insurance & licensing',
-                'Parking & tolls',
-                'Business travel & accommodation',
+            'expense.vehicles_travel' => [
+                'name' => 'Vehicles & travel',
+                'children' => [
+                    'fuel' => 'Fuel',
+                    'vehicle_repairs_maintenance' => 'Vehicle repairs & maintenance',
+                    'vehicle_insurance_licensing' => 'Vehicle insurance & licensing',
+                    'parking_tolls' => 'Parking & tolls',
+                    'business_travel_accommodation' => 'Business travel & accommodation',
+                ],
             ],
 
-            'Sales & marketing' => [
-                'Advertising',
-                'Marketing & promotions',
-                'Website & online presence',
-                'Marketing materials / printing',
+            'expense.sales_marketing' => [
+                'name' => 'Sales & marketing',
+                'children' => [
+                    'advertising' => 'Advertising',
+                    'marketing_promotions' => 'Marketing & promotions',
+                    'website_online_presence' => 'Website & online presence',
+                    'marketing_materials_printing' => 'Marketing materials / printing',
+                ],
             ],
 
-            'Professional & financial' => [
-                'Accounting & bookkeeping fees',
-                'Legal fees',
-                'Bank charges',
-                'Loan interest',
-                'Licences, permits & registrations',
+            'expense.professional_financial' => [
+                'name' => 'Professional & financial',
+                'children' => [
+                    'accounting_bookkeeping' => 'Accounting & bookkeeping fees',
+                    'legal_fees' => 'Legal fees',
+                    'bank_charges' => 'Bank charges',
+                    'loan_interest' => 'Loan interest',
+                    'licences_permits_registrations' => 'Licences, permits & registrations',
+                ],
             ],
 
-            'Communications & technology' => [
-                'Phone & internet',
-                'Software & subscriptions',
-                'IT support & equipment',
+            'expense.communications_technology' => [
+                'name' => 'Communications & technology',
+                'children' => [
+                    'phone_internet' => 'Phone & internet',
+                    'software_subscriptions' => 'Software & subscriptions',
+                    'it_support_equipment' => 'IT support & equipment',
+                ],
             ],
 
-            'Taxes & statutory' => [
-                'Business taxes (as applicable)',
-                'Government fees & levies',
+            'expense.taxes_statutory' => [
+                'name' => 'Taxes & statutory',
+                'children' => [
+                    'business_taxes' => 'Business taxes (as applicable)',
+                    'government_fees_levies' => 'Government fees & levies',
+                ],
             ],
 
-            'Other' => [
-                'Freight & delivery',
-                'Subscriptions & memberships',
-                'Miscellaneous / sundry',
+            'expense.other' => [
+                'name' => 'Other',
+                'children' => [
+                    'freight_delivery' => 'Freight & delivery',
+                    'subscriptions_memberships' => 'Subscriptions & memberships',
+                    'miscellaneous_sundry' => 'Miscellaneous / sundry',
+                ],
             ],
         ];
     }
 
-    /**
-     * Create the built-in categories for a user.
-     */
     public function createDefaultsFor(User $user): void
     {
         DB::transaction(function () use ($user) {
-            foreach ($this->incomeCategories() as $name) {
+            foreach ($this->incomeCategories() as $key => $name) {
                 Category::firstOrCreate(
                     [
                         'user_id' => $user->id,
+                        'default_key' => $key,
+                    ],
+                    [
                         'name' => $name,
                         'type' => 'income',
                         'parent_id' => null,
-                    ],
-                    [
                         'is_default' => true,
                         'is_hidden' => false,
                     ]
                 );
             }
 
-            foreach ($this->expenseCategories() as $group => $items) {
+            foreach ($this->expenseCategories() as $groupKey => $group) {
                 $parent = Category::firstOrCreate(
                     [
                         'user_id' => $user->id,
-                        'name' => $group,
-                        'type' => 'expense',
-                        'parent_id' => null,
+                        'default_key' => $groupKey,
                     ],
                     [
+                        'name' => $group['name'],
+                        'type' => 'expense',
+                        'parent_id' => null,
                         'is_default' => true,
                         'is_hidden' => false,
                     ]
                 );
 
-                foreach ($items as $name) {
+                foreach ($group['children'] as $childKey => $name) {
                     Category::firstOrCreate(
                         [
                             'user_id' => $user->id,
+                            'default_key' => "{$groupKey}.{$childKey}",
+                        ],
+                        [
                             'name' => $name,
                             'type' => 'expense',
                             'parent_id' => $parent->id,
-                        ],
-                        [
                             'is_default' => true,
                             'is_hidden' => false,
                         ]
@@ -147,16 +168,11 @@ class CategoryService
         });
     }
 
-    /**
-     * Seed defaults for every existing user.
-     */
     public function createDefaultsForAllUsers(): void
     {
         User::query()
             ->select('id')
             ->orderBy('id')
-            ->each(function (User $user) {
-                $this->createDefaultsFor($user);
-            });
+            ->each(fn (User $user) => $this->createDefaultsFor($user));
     }
 }

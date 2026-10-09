@@ -24,7 +24,6 @@ class extends Component
     public string $payment_method = 'bank';
     public string $bank = '';
     public string $reference = '';
-
     public string $search = '';
     public string $typeFilter = 'all';
     public string $paymentMethodFilter = 'all';

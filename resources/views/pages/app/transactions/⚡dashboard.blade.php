@@ -585,7 +585,7 @@ class extends Component
                     </p>
                 </div>
 
-                <a href="{{ route('transactions') }}"
+                <a wire:navigate href="{{ route('transactions') }}"
                    class="whitespace-nowrap text-sm font-semibold text-blue-600 hover:text-blue-800">
                     View all
                     <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>

@@ -18,7 +18,7 @@
 
     {{-- Navigation --}}
     <header class="border-b border-zinc-200 dark:border-zinc-800 mb-5">
-        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
+        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between lg:px-8">
 
             {{-- Logo --}}
             <a wire:navigate href="{{ route('home') }}" class="flex items-center gap-2">
@@ -31,22 +31,76 @@
             </a>
 
             {{-- Navigation --}}
-            <nav class="flex items-center gap-2">
+<nav class="flex min-w-0 items-center justify-end gap-2 sm:gap-3">
+    @auth
+        {{-- Desktop navigation --}}
+        <div class="hidden min-w-0 items-center gap-1 lg:flex">
+            <flux:button
+                href="{{ route('home') }}"
+                variant="ghost"
+                wire:navigate
+                class="{{ request()->routeIs('home') ? 'bg-zinc-100 font-semibold text-zinc-900 dark:bg-zinc-800 dark:text-white' : 'text-zinc-600 dark:text-zinc-300' }}"
+            >
+                Dashboard
+            </flux:button>
 
-                @auth
-                
+            <flux:button
+                href="{{ route('transactions') }}"
+                variant="ghost"
+                wire:navigate
+                class="{{ request()->routeIs('transactions') ? 'bg-zinc-100 font-semibold text-zinc-900 dark:bg-zinc-800 dark:text-white' : 'text-zinc-600 dark:text-zinc-300' }}"
+            >
+                Transactions
+            </flux:button>
 
-                    {{-- <flux:button
-                        href="{{ route('dashboard') }}"
-                        variant="ghost"
+            <flux:button
+                href="{{ route('opening-balances') }}"
+                variant="ghost"
+                wire:navigate
+                class="{{ request()->routeIs('opening-balances') ? 'bg-zinc-100 font-semibold text-zinc-900 dark:bg-zinc-800 dark:text-white' : 'text-zinc-600 dark:text-zinc-300' }}"
+            >
+                Balances
+            </flux:button>
+
+            <flux:button
+                href="{{ route('categories') }}"
+                variant="ghost"
+                wire:navigate
+                class="{{ request()->routeIs('categories') ? 'bg-zinc-100 font-semibold text-zinc-900 dark:bg-zinc-800 dark:text-white' : 'text-zinc-600 dark:text-zinc-300' }}"
+            >
+                Categories
+            </flux:button>
+
+            <flux:button
+                href="{{ route('reports') }}"
+                variant="ghost"
+                wire:navigate
+                class="{{ request()->routeIs('reports') ? 'bg-zinc-100 font-semibold text-zinc-900 dark:bg-zinc-800 dark:text-white' : 'text-zinc-600 dark:text-zinc-300' }}"
+            >
+                Reports
+            </flux:button>
+        </div>
+
+        {{-- Mobile navigation --}}
+        <div class="lg:hidden">
+            <flux:dropdown position="bottom" align="end">
+                <flux:button variant="ghost" icon="bars-3" aria-label="Open navigation menu" />
+
+                <flux:menu class="min-w-56">
+                    <flux:menu.item
+                        href="{{ route('home') }}"
+                        icon=""
+                        wire:navigate
+                        :class="request()->routeIs('home') ? 'font-semibold' : ''"
                     >
                         Dashboard
-                    </flux:button> --}}
-                    
+                    </flux:menu.item>
+
                     <flux:menu.item
                         href="{{ route('transactions') }}"
                         icon=""
                         wire:navigate
+                        :class="request()->routeIs('transactions') ? 'font-semibold' : ''"
                     >
                         Transactions
                     </flux:menu.item>
@@ -55,6 +109,7 @@
                         href="{{ route('opening-balances') }}"
                         icon=""
                         wire:navigate
+                        :class="request()->routeIs('opening-balances') ? 'font-semibold' : ''"
                     >
                         Balances
                     </flux:menu.item>
@@ -63,6 +118,7 @@
                         href="{{ route('categories') }}"
                         icon=""
                         wire:navigate
+                        :class="request()->routeIs('categories') ? 'font-semibold' : ''"
                     >
                         Categories
                     </flux:menu.item>
@@ -71,104 +127,90 @@
                         href="{{ route('reports') }}"
                         icon=""
                         wire:navigate
+                        :class="request()->routeIs('reports') ? 'font-semibold' : ''"
                     >
                         Reports
                     </flux:menu.item>
+                </flux:menu>
+            </flux:dropdown>
+        </div>
 
-                    <flux:dropdown position="bottom" align="end">
-                        <flux:button variant="ghost" class="flex items-center gap-2">
-                            <div class="flex size-9 items-center justify-center rounded-full bg-zinc-200 text-sm font-semibold text-zinc-700 dark:bg-zinc-700 dark:text-white">
-                                {{ collect(explode(' ', trim(auth()->user()->name)))
-                                    ->filter()
-                                    ->take(2)
-                                    ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
-                                    ->implode('') }}
-                            </div>
+        {{-- Profile dropdown --}}
+        <flux:dropdown position="bottom" align="end">
+            <flux:button variant="ghost" class="flex shrink-0 items-center gap-2">
+                <div class="flex size-9 items-center justify-center rounded-full bg-zinc-200 text-sm font-semibold text-zinc-700 dark:bg-zinc-700 dark:text-white">
+                    {{ collect(explode(' ', trim(auth()->user()->name)))
+                        ->filter()
+                        ->take(2)
+                        ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+                        ->implode('') }}
+                </div>
 
-                            <span class="hidden sm:block">
-                                {{ auth()->user()->name }}
-                            </span>
+                <span class="hidden max-w-36 truncate xl:block">
+                    {{ auth()->user()->name }}
+                </span>
 
-                            <flux:icon.chevron-down variant="micro" />
-                        </flux:button>
+                <flux:icon.chevron-down variant="micro" />
+            </flux:button>
 
-                        <flux:menu class="min-w-56">
-                            <div class="px-3 py-3">
-                                <div class="text-sm font-semibold">
-                                    {{ auth()->user()->name }}
-                                </div>
+            <flux:menu class="min-w-56">
+                <div class="px-3 py-3">
+                    <div class="text-sm font-semibold">
+                        {{ auth()->user()->name }}
+                    </div>
 
-                                <div class="text-xs text-zinc-500">
-                                    {{ auth()->user()->email }}
-                                </div>
-                            </div>
+                    <div class="text-xs text-zinc-500">
+                        {{ auth()->user()->email }}
+                    </div>
+                </div>
 
-                            <flux:menu.separator />
+                <flux:menu.separator />
 
-                            <flux:menu.item
-                                href="{{ route('subscription') }}"
-                                icon="credit-card"
-                                wire:navigate
-                            >
-                                Subscription
-                            </flux:menu.item>
+                <flux:menu.item
+                    href="{{ route('subscription') }}"
+                    icon="credit-card"
+                    wire:navigate
+                >
+                    Subscription
+                </flux:menu.item>
 
-                            <flux:menu.item
-                                href="{{ route('profile.edit') }}"
-                                icon="user"
-                                wire:navigate
-                            >
-                                Profile settings
-                            </flux:menu.item>
+                <flux:menu.separator />
 
-                            <flux:menu.separator />
+                <div class="px-3 py-2">
+                    <livewire:notification-nav-item />
+                </div>
 
-                            <div class="px-3 py-2">
-                                <livewire:notification-nav-item />
-                            </div>
+                <flux:menu.separator />
 
-                            <flux:menu.separator />
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
 
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-
-                                <flux:menu.item
-                                    as="button"
-                                    type="submit"
-                                    icon="arrow-right-start-on-rectangle"
-                                >
-                                    Log out
-                                </flux:menu.item>
-                            </form>
-                        </flux:menu>
-                    </flux:dropdown>
-
-                @else
-
-                    <flux:button
-                        href="{{ route('login') }}"
-                        variant="ghost"
+                    <flux:menu.item
+                        as="button"
+                        type="submit"
+                        icon="arrow-right-start-on-rectangle"
                     >
-                        Log in
-                    </flux:button>
+                        Log out
+                    </flux:menu.item>
+                </form>
+            </flux:menu>
+        </flux:dropdown>
+    @else
+        <flux:button href="{{ route('login') }}" variant="ghost">
+            Log in
+        </flux:button>
 
-                    <flux:button
-                        href="{{ route('register') }}"
-                        variant="primary"
-                    >
-                        Sign up
-                    </flux:button>
-
-                @endauth
-
-            </nav>
-
+        <flux:button href="{{ route('register') }}" variant="primary">
+            Sign up
+        </flux:button>
+    @endauth
+</nav>
         </div>
     </header>
 
 
     {{-- Hero --}}
-    <main class="p-10 mx-auto max-w-7xl ">
+    <main class="p-5 mx-auto max-w-7xl ">
         {{ $slot }}
     </main>
 

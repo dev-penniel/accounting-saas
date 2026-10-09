@@ -26,7 +26,7 @@
                     <img src="/fav.png" alt="" class="w-8">
 
                 <span class="font-semibold tracking-tight">
-                    {{ config('app.name', 'StarterKit') }}
+                    {{ config('app.name', 'StarterKit') }} 
                 </span>
             </a>
 
@@ -43,16 +43,73 @@
                         Dashboard
                     </flux:button> --}}
 
-                    <flux:button
-                        href="{{ route('subscription') }}"
-                        variant="ghost"
-                        :current="request()->routeIs('subscription')"
-                        wire:navigate
-                    >
-                        Subscription
-                    </flux:button>
+                    <flux:dropdown position="bottom" align="end">
+                        <flux:button variant="ghost" class="flex items-center gap-2">
+                            <div class="flex size-9 items-center justify-center rounded-full bg-zinc-200 text-sm font-semibold text-zinc-700 dark:bg-zinc-700 dark:text-white">
+                                {{ collect(explode(' ', trim(auth()->user()->name)))
+                                    ->filter()
+                                    ->take(2)
+                                    ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+                                    ->implode('') }}
+                            </div>
 
-                    <livewire:notification-nav-item />
+                            <span class="hidden sm:block">
+                                {{ auth()->user()->name }}
+                            </span>
+
+                            <flux:icon.chevron-down variant="micro" />
+                        </flux:button>
+
+                        <flux:menu class="min-w-56">
+                            <div class="px-3 py-3">
+                                <div class="text-sm font-semibold">
+                                    {{ auth()->user()->name }}
+                                </div>
+
+                                <div class="text-xs text-zinc-500">
+                                    {{ auth()->user()->email }}
+                                </div>
+                            </div>
+
+                            <flux:menu.separator />
+
+                            <flux:menu.item
+                                href="{{ route('subscription') }}"
+                                icon="credit-card"
+                                wire:navigate
+                            >
+                                Subscription
+                            </flux:menu.item>
+
+                            <flux:menu.item
+                                href="{{ route('profile.edit') }}"
+                                icon="user"
+                                wire:navigate
+                            >
+                                Profile settings
+                            </flux:menu.item>
+
+                            <flux:menu.separator />
+
+                            <div class="px-3 py-2">
+                                <livewire:notification-nav-item />
+                            </div>
+
+                            <flux:menu.separator />
+
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+
+                                <flux:menu.item
+                                    as="button"
+                                    type="submit"
+                                    icon="arrow-right-start-on-rectangle"
+                                >
+                                    Log out
+                                </flux:menu.item>
+                            </form>
+                        </flux:menu>
+                    </flux:dropdown>
 
                 @else
 

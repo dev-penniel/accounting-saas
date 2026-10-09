@@ -14,16 +14,14 @@ Route::middleware(['auth', 'verified', 'subscription'])->group(function () {
     Route::livewire('c-dashboard', 'pages::app.c-dashboard')->name('c-dashboard');
     Route::livewire('/', 'pages::app.transactions.index')->name('home');
     Route::livewire('/categories', 'pages::app.transactions.categories')->name('categories');
+    Route::livewire('/opening-balances', 'pages::app.transactions.opening-balances')->name('opening-balances');
 
 });
 
 Route::middleware(['auth', 'verified', 'permission:access-dashboard'])->group(function () {
 
     Route::livewire('dashboard', 'pages::dashboard')->name('dashboard');
-
     Route::livewire('/notifications', 'pages::notifications.index' )->name('notifications');
-
-
     Route::livewire('/subscriptions', 'pages::subscription.admin.index' )->name('subscriptions');
 
     Route::livewire('/roles', 'pages::roles.index' )->name('roles');

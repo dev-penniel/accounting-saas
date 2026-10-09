@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified', 'subscription'])->group(function () {
     
     Route::livewire('c-dashboard', 'pages::app.c-dashboard')->name('c-dashboard');
     Route::livewire('/', 'pages::app.transactions.index')->name('home');
+    Route::livewire('/categories', 'pages::app.transactions.categories')->name('categories');
 
 });
 

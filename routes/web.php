@@ -11,7 +11,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'verified', 'subscription'])->group(function () {
     
-    Route::livewire('', 'pages::app.c-dashboard')->name('home');
+    Route::livewire('/', 'pages::app.transactions.dashboard')->name('home');
     Route::livewire('/transactions', 'pages::app.transactions.index')->name('transactions');
     Route::livewire('/categories', 'pages::app.transactions.categories')->name('categories');
     Route::livewire('/opening-balances', 'pages::app.transactions.opening-balances')->name('opening-balances');

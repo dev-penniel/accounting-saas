@@ -42,6 +42,38 @@
                     >
                         Dashboard
                     </flux:button> --}}
+                    
+                    <flux:menu.item
+                        href="{{ route('transactions') }}"
+                        icon=""
+                        wire:navigate
+                    >
+                        Transactions
+                    </flux:menu.item>
+
+                    <flux:menu.item
+                        href="{{ route('opening-balances') }}"
+                        icon=""
+                        wire:navigate
+                    >
+                        Balances
+                    </flux:menu.item>
+
+                    <flux:menu.item
+                        href="{{ route('categories') }}"
+                        icon=""
+                        wire:navigate
+                    >
+                        Categories
+                    </flux:menu.item>
+
+                    <flux:menu.item
+                        href="{{ route('reports') }}"
+                        icon=""
+                        wire:navigate
+                    >
+                        Reports
+                    </flux:menu.item>
 
                     <flux:dropdown position="bottom" align="end">
                         <flux:button variant="ghost" class="flex items-center gap-2">

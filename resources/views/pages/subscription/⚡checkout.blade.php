@@ -23,7 +23,7 @@ class extends \Livewire\Component
     public function mount()
     {
         if (auth()->user()->hasRole('General Admin')) {
-            $this->redirectRoute('dashboad');
+            $this->redirectRoute('dashboard');
         }
     }
 

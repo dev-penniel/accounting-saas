@@ -29,6 +29,7 @@ class extends Component
     public string $paymentMethodFilter = 'all';
     public string $fromDate = '';
     public string $toDate = '';
+    public ?int $editingTransactionId = null;
 
     public function mount(): void
     {
@@ -43,6 +44,8 @@ class extends Component
 
         $this->resetValidation();
 
+        $this->editingTransactionId = null;
+
         $this->type = $type;
         $this->date = now()->toDateString();
         $this->category_id = '';
@@ -56,9 +59,35 @@ class extends Component
         $this->dispatch('modal-show', name: 'transaction-form');
     }
 
+    public function editTransaction(int $id): void
+    {
+        $transaction = auth()->user()
+            ->transactions()
+            ->findOrFail($id);
+
+        $this->resetValidation();
+
+        $this->editingTransactionId = $transaction->id;
+
+        $this->type = $transaction->type;
+        $this->date = $transaction->date->format('Y-m-d');
+        $this->description = $transaction->description;
+        $this->category_id = (string) $transaction->category_id;
+        $this->amount = (string) $transaction->amount;
+        $this->counterparty_name = $transaction->counterparty_name ?? '';
+        $this->payment_method = $transaction->payment_method;
+        $this->bank = $transaction->bank ?? '';
+        $this->reference = $transaction->reference ?? '';
+
+        $this->dispatch('modal-show', name: 'transaction-form');
+    }
+
     public function closeForm(): void
     {
         $this->dispatch('modal-close', name: 'transaction-form');
+
+        $this->editingTransactionId = null;
+
         $this->resetValidation();
     }
 
@@ -187,23 +216,9 @@ class extends Component
             ->paginate(10);
     }
 
+    
     public function save(): void
     {
-        // Test
-        // $validated = $this->validate([
-        //     'type' => ['required', Rule::in(['income', 'expense'])],
-        //     'date' => ['required', 'date'],
-        //     'description' => ['required', 'string', 'max:255'],
-        //     'category_id' => ['required', 'integer', 'exists:categories,id'],
-        //     'amount' => ['required', 'numeric', 'gt:0', 'max:9999999999.99'],
-        //     'counterparty_name' => ['nullable', 'string', 'max:255'],
-        //     'payment_method' => ['required', Rule::in(['bank', 'mpesa', 'ecocash'])],
-        //     'bank' => ['nullable', 'string'],
-        //     'reference' => ['nullable', 'string', 'max:255'],
-        // ]);
-
-        // production
-
         $validated = $this->validate([
             'type' => ['required', Rule::in(['income', 'expense'])],
             'date' => ['required', 'date'],
@@ -247,19 +262,29 @@ class extends Component
 
             'reference' => ['nullable', 'string', 'max:255'],
         ]);
-    
+
         $validated['bank'] = $validated['payment_method'] === 'bank'
             ? $validated['bank']
             : null;
 
-        
-        
-        auth()->user()->transactions()->create($validated);
+        if ($this->editingTransactionId !== null) {
+            $transaction = auth()->user()
+                ->transactions()
+                ->findOrFail($this->editingTransactionId);
 
-        $this->showForm = false;
-        $this->resetPage();
+            $transaction->update($validated);
+
+            $message = 'Transaction updated successfully.';
+        } else {
+            auth()->user()->transactions()->create($validated);
+
+            $message = 'Transaction saved successfully.';
+        }
+
+        $this->dispatch('modal-close', name: 'transaction-form');
 
         $this->reset([
+            'editingTransactionId',
             'description',
             'category_id',
             'amount',
@@ -273,8 +298,25 @@ class extends Component
         $this->date = now()->toDateString();
 
         $this->resetValidation();
+        $this->resetPage();
 
-        session()->flash('success', 'Transaction saved successfully.');
+        session()->flash('success', $message);
+    }
+
+    public function deleteTransaction(int $id): void
+    {
+        $transaction = auth()->user()
+            ->transactions()
+            ->findOrFail($id);
+
+        $transaction->delete();
+
+        // Clear any cached computed data.
+        unset($this->transactions, $this->summary);
+
+        $this->resetPage();
+
+        session()->flash('success', 'Transaction deleted successfully.');
     }
 };
 ?>
@@ -390,12 +432,12 @@ class extends Component
         <div class="flex items-start justify-between gap-4">
             <div>
                 <flux:heading size="lg">
-                    {{ $type === 'income' ? 'Record income' : 'Record expense' }}
+                    @if ($editingTransactionId !== null)
+                        Edit {{ $type }}
+                    @else
+                        {{ $type === 'income' ? 'Record income' : 'Record expense' }}
+                    @endif
                 </flux:heading>
-
-                <flux:subheading>
-                    Record your business transaction accurately.
-                </flux:subheading>
 
 
                 @if (session('success'))
@@ -580,11 +622,12 @@ class extends Component
                     wire:target="save"
                 >
                     <span wire:loading.remove wire:target="save">
-                        Save {{ $type }}
+                        {{ $editingTransactionId !== null ? 'Update' : 'Save' }}
+                        {{ $type }}
                     </span>
 
                     <span wire:loading wire:target="save">
-                        Saving...
+                        {{ $editingTransactionId !== null ? 'Updating' : 'Saving' }}...
                     </span>
                 </flux:button>
             </div>
@@ -656,6 +699,7 @@ class extends Component
                             <th class="px-5 py-3 font-medium">Category</th>
                             <th class="px-5 py-3 font-medium">Payment method</th>
                             <th class="px-5 py-3 text-right font-medium">Amount</th>
+                            <th class="px-5 py-3 text-right font-medium">Actions</th>
                         </tr>
                     </thead>
 
@@ -710,6 +754,31 @@ class extends Component
                                         {{ ucfirst($transaction->type) }}
                                     </div>
                                 </td>
+
+                                
+                                <td class="whitespace-nowrap px-5 py-4 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <flux:button
+                                            size="sm"
+                                            variant="ghost"
+                                            icon="pencil"
+                                            wire:click="editTransaction({{ $transaction->id }})"
+                                        >
+                                            Edit
+                                        </flux:button>
+
+                                        <flux:button
+                                            size="sm"
+                                            variant="danger"
+                                            icon="trash"
+                                            wire:click="deleteTransaction({{ $transaction->id }})"
+                                            wire:confirm="Are you sure you want to delete this transaction? This action cannot be undone."
+                                        >
+                                            Delete
+                                        </flux:button>
+                                    </div>
+                                </td>
+
                             </tr>
                         @endforeach
                     </tbody>

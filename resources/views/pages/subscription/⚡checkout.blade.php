@@ -20,6 +20,13 @@ class extends \Livewire\Component
 
     public $proofOfPayment = null;
 
+    public function mount()
+    {
+        if (auth()->user()->hasRole('General Admin')) {
+            $this->redirectRoute('dashboad');
+        }
+    }
+
     #[Computed]
     public function plans(): array
     {

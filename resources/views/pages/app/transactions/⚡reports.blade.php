@@ -12,6 +12,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 new 
 #[Layout('layouts::app.frontend')]
@@ -460,6 +461,307 @@ class extends Component
     {
         $this->resetPage();
     }
+
+    // Export CSV and PDF
+    public function exportCsv()
+    {
+        $data = $this->buildExportData();
+
+        $filename = str($data['title'])->slug()
+            . '-'
+            . now()->format('Y-m-d')
+            . '.csv';
+
+        return response()->streamDownload(function () use ($data) {
+            $output = fopen('php://output', 'w');
+
+            // Help Excel recognise UTF-8 correctly.
+            fwrite($output, "\xEF\xBB\xBF");
+
+            fputcsv($output, [$data['title']]);
+            fputcsv($output, ['Period', $data['period']]);
+            fputcsv($output, ['Generated', $data['generatedAt']]);
+            fputcsv($output, []);
+
+            foreach ($data['summary'] as $label => $value) {
+                fputcsv($output, [$label, $value]);
+            }
+
+            foreach ($data['sections'] as $section) {
+                fputcsv($output, []);
+                fputcsv($output, [$section['heading']]);
+
+                if (!empty($section['headers'])) {
+                    fputcsv($output, $section['headers']);
+                }
+
+                foreach ($section['rows'] as $row) {
+                    fputcsv($output, $row);
+                }
+            }
+
+            fclose($output);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    public function exportPdf()
+    {
+        $data = $this->buildExportData();
+
+        $filename = str($data['title'])->slug()
+            . '-'
+            . now()->format('Y-m-d')
+            . '.pdf';
+
+        return Pdf::loadView('reports.financial-export', $data)
+            ->setPaper('a4', 'landscape')
+            ->download($filename);
+    }
+
+    /**
+     * Prepare the same report data for both CSV and PDF.
+     */
+    private function buildExportData(): array
+    {
+        $titles = [
+            'summary' => 'Financial Overview',
+            'income_register' => 'Income Register',
+            'expense_register' => 'Expense Register',
+            'category_breakdown' => 'Category Breakdown',
+            'comparison' => 'Period Comparison',
+            'payment_breakdown' => 'Payment Breakdown',
+            'payment_register' => 'Payment Register',
+        ];
+
+        $title = $titles[$this->report] ?? 'Financial Report';
+
+        $period = $this->report === 'comparison'
+            ? $this->compareFrom . ' to ' . $this->compareTo
+                . ' versus '
+                . $this->compareFromTwo . ' to ' . $this->compareToTwo
+            : $this->fromDate . ' to ' . $this->toDate;
+
+        $data = [
+            'title' => $title,
+            'period' => $period,
+            'generatedAt' => now()->format('d M Y H:i'),
+            'summary' => [],
+            'sections' => [],
+        ];
+
+        switch ($this->report) {
+            case 'summary':
+                $totals = $this->totals($this->fromDate, $this->toDate);
+
+                $data['summary'] = [
+                    'Total income (M)' => number_format($totals['income'], 2, '.', ''),
+                    'Total expenses (M)' => number_format($totals['expenses'], 2, '.', ''),
+                    'Net result (M)' => number_format($totals['net'], 2, '.', ''),
+                    'Transactions' => $totals['count'],
+                ];
+
+                $data['sections'][] = [
+                    'heading' => 'Income and Expenses',
+                    'headers' => ['Measure', 'Amount (M)'],
+                    'rows' => [
+                        ['Income', number_format($totals['income'], 2, '.', '')],
+                        ['Expenses', number_format($totals['expenses'], 2, '.', '')],
+                        ['Net result', number_format($totals['net'], 2, '.', '')],
+                    ],
+                ];
+
+                break;
+
+            case 'category_breakdown':
+                $categories = $this->categoryBreakdown();
+
+                foreach ([
+                    'income' => 'Income by Category',
+                    'expense' => 'Expenses by Category',
+                ] as $type => $heading) {
+                    $rows = $categories->get($type, collect());
+                    $total = (float) $rows->sum('total');
+
+                    $data['sections'][] = [
+                        'heading' => $heading,
+                        'headers' => ['Category', 'Amount (M)', 'Share (%)'],
+                        'rows' => $rows->map(fn ($row) => [
+                            $row->category_name,
+                            number_format((float) $row->total, 2, '.', ''),
+                            $total > 0
+                                ? number_format(((float) $row->total / $total) * 100, 1, '.', '')
+                                : '0.0',
+                        ])->values()->all(),
+                    ];
+
+                    $data['summary'][$heading . ' total (M)'] =
+                        number_format($total, 2, '.', '');
+                }
+
+                break;
+
+            case 'comparison':
+                $comparison = $this->comparison();
+
+                $data['sections'][] = [
+                    'heading' => 'Period Comparison',
+                    'headers' => [
+                        'Measure',
+                        'Period A (M)',
+                        'Period B (M)',
+                        'Change (M)',
+                        'Change (%)',
+                    ],
+                    'rows' => collect([
+                        'income' => 'Income',
+                        'expenses' => 'Expenses',
+                        'net' => 'Net result',
+                    ])->map(function ($label, $key) use ($comparison) {
+                        $row = $comparison[$key];
+
+                        return [
+                            $label,
+                            number_format($row['first'], 2, '.', ''),
+                            number_format($row['second'], 2, '.', ''),
+                            number_format($row['change'], 2, '.', ''),
+                            $row['percentage'] === null
+                                ? 'N/A'
+                                : number_format($row['percentage'], 1, '.', '') . '%',
+                        ];
+                    })->values()->all(),
+                ];
+
+                break;
+
+            case 'payment_breakdown':
+                $breakdown = $this->paymentBreakdown();
+
+                $data['sections'][] = [
+                    'heading' => 'Payment Method Breakdown',
+                    'headers' => ['Payment Method', 'Income (M)', 'Expenses (M)', 'Net (M)'],
+                    'rows' => collect($breakdown['methods'])
+                        ->map(fn ($row) => [
+                            $row['label'],
+                            number_format($row['income'], 2, '.', ''),
+                            number_format($row['expenses'], 2, '.', ''),
+                            number_format($row['net'], 2, '.', ''),
+                        ])->values()->all(),
+                ];
+
+                $data['sections'][] = [
+                    'heading' => 'Bank Breakdown',
+                    'headers' => ['Bank', 'Income (M)', 'Expenses (M)', 'Net (M)'],
+                    'rows' => collect($breakdown['banks'])
+                        ->map(fn ($row) => [
+                            $row['label'],
+                            number_format($row['income'], 2, '.', ''),
+                            number_format($row['expenses'], 2, '.', ''),
+                            number_format($row['net'], 2, '.', ''),
+                        ])->values()->all(),
+                ];
+
+                break;
+
+            case 'income_register':
+            case 'expense_register':
+            case 'payment_register':
+                $rows = $this->exportRegisterRows();
+                $totals = $this->registerTotals();
+
+                $data['summary'] = [
+                    'Total income (M)' => number_format($totals['income'], 2, '.', ''),
+                    'Total expenses (M)' => number_format($totals['expenses'], 2, '.', ''),
+                    'Net movement (M)' => number_format($totals['net'], 2, '.', ''),
+                    'Entries' => $totals['count'],
+                ];
+
+                if ($this->report === 'payment_register') {
+                    $opening = $this->paymentRegisterOpeningBalance();
+
+                    if ($opening !== null) {
+                        $data['summary']['Opening balance (M)'] =
+                            number_format($opening, 2, '.', '');
+                    }
+                }
+
+                $data['sections'][] = [
+                    'heading' => $title,
+                    'headers' => [
+                        'Date',
+                        'Description',
+                        'Counterparty',
+                        'Category',
+                        'Payment Method',
+                        'Bank',
+                        'Income (M)',
+                        'Expense (M)',
+                        'Running Total (M)',
+                    ],
+                    'rows' => $rows->map(fn ($transaction) => [
+                        $transaction->date?->format('Y-m-d') ?? '',
+                        $transaction->description ?? '',
+                        $transaction->counterparty_name ?? '',
+                        $transaction->category?->name ?? 'Uncategorised',
+                        [
+                            'bank' => 'Bank Account',
+                            'mpesa' => 'M-Pesa',
+                            'ecocash' => 'EcoCash',
+                        ][$transaction->payment_method] ?? $transaction->payment_method,
+                        $transaction->bank ?? '',
+                        $transaction->type === 'income'
+                            ? number_format((float) $transaction->amount, 2, '.', '')
+                            : '',
+                        $transaction->type === 'expense'
+                            ? number_format((float) $transaction->amount, 2, '.', '')
+                            : '',
+                        number_format((float) $transaction->running_total, 2, '.', ''),
+                    ])->values()->all(),
+                ];
+
+                break;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Fetch every matching register transaction, not just the current page.
+     * Running balances are calculated oldest-to-newest, then returned newest-first.
+     */
+    private function exportRegisterRows(): Collection
+    {
+        $rows = $this->registerQuery()
+            ->orderBy('date')
+            ->orderBy('id')
+            ->get();
+
+        $running = 0.0;
+
+        if ($this->report === 'payment_register' && $this->paymentMethodFilter !== 'all') {
+            $running = $this->paymentMethodFilter === 'bank'
+                ? $this->openingBalance(
+                    'bank',
+                    $this->bankFilter === 'all' ? null : $this->bankFilter
+                )
+                : $this->openingBalance($this->paymentMethodFilter);
+        }
+
+        $rows->each(function ($transaction) use (&$running) {
+            if ($this->report === 'payment_register') {
+                $running += $transaction->type === 'income'
+                    ? (float) $transaction->amount
+                    : -(float) $transaction->amount;
+            } else {
+                $running += (float) $transaction->amount;
+            }
+
+            $transaction->running_total = $running;
+        });
+
+        return $rows->reverse()->values();
+    }
 };
 ?>
 
@@ -508,6 +810,29 @@ class extends Component
                 </button>
             @endforeach
         </div>
+    </div>
+
+    {{-- Report exports --}}
+    <div class="flex flex-wrap items-center justify-end gap-3">
+        <flux:button
+            variant="outline"
+            icon="document-text"
+            wire:click="exportCsv"
+            wire:loading.attr="disabled"
+            wire:target="exportCsv"
+        >
+            Export CSV
+        </flux:button>
+
+        {{-- <flux:button
+            variant="primary"
+            icon="document-arrow-down"
+            wire:click="exportPdf"
+            wire:loading.attr="disabled"
+            wire:target="exportPdf"
+        >
+            Export PDF
+        </flux:button> --}}
     </div>
 
     {{-- Date filters --}}

@@ -254,53 +254,51 @@ class extends \Livewire\Component
 
             <div class="grid gap-5 md:grid-cols-2">
 
-                @foreach ($this->plans as $key => $planData)
+                
+            @foreach ($this->plans as $key => $planData)
 
-                    <button
-                        type="button"
-                        wire:click="selectPlan('{{ $key }}')"
-                        wire:key="plan-{{ $key }}"
-                        class="relative rounded-2xl border-2 p-6 text-left transition
-                        {{ $plan === $key
-                            ? 'border-primary bg-primary/5'
-                            : 'border-gray-200 bg-white hover:border-gray-300' }}"
-                    >
+                <button
+                    type="button"
+                    wire:click="selectPlan('{{ $key }}')"
+                    wire:key="plan-{{ $key }}"
+                    class="relative rounded-2xl border-2 p-6 text-left transition-all duration-200
+                    {{ $plan === $key
+                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm'
+                        : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm' }}"
+                >
 
-                        @if ($plan === $key)
-
-                            <div class="absolute right-5 top-5">
-                                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-                                    ✓
-                                </span>
-                            </div>
-
-                        @endif
-
-                        <p class="text-sm font-medium text-gray-500">
-                            {{ $planData['name'] }}
-                        </p>
-
-                        <div class="mt-2 flex items-baseline gap-1">
-
-                            <span class="text-3xl font-bold text-gray-900">
-                                M{{ number_format($planData['amount'], 2) }}
+                    @if ($plan === $key)
+                        <div class="absolute right-5 top-5">
+                            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shadow-sm">
+                                ✓
                             </span>
-
-                            <span class="text-sm text-gray-500">
-                                /{{ $key === 'monthly' ? 'month' : 'year' }}
-                            </span>
-
                         </div>
+                    @endif
 
-                        <p class="mt-4 text-sm text-gray-600">
-                            {{ $key === 'monthly'
-                                ? 'Flexible monthly access.'
-                                : 'Full-year access at a discounted rate.' }}
-                        </p>
+                    <p class="text-sm font-medium {{ $plan === $key ? 'text-primary' : 'text-gray-500' }}">
+                        {{ $planData['name'] }}
+                    </p>
 
-                    </button>
+                    <div class="mt-2 flex items-baseline gap-1">
+                        <span class="text-3xl font-bold text-gray-900">
+                            M{{ number_format($planData['amount'], 2) }}
+                        </span>
 
-                @endforeach
+                        <span class="text-sm text-gray-500">
+                            /{{ $key === 'monthly' ? 'month' : 'year' }}
+                        </span>
+                    </div>
+
+                    <p class="mt-4 text-sm text-gray-600">
+                        {{ $key === 'monthly'
+                            ? 'Flexible monthly access.'
+                            : 'Full-year access at a discounted rate.' }}
+                    </p>
+
+                </button>
+
+            @endforeach
+
 
             </div>
 
@@ -332,25 +330,115 @@ class extends \Livewire\Component
 
                 <div class="mt-4 space-y-3 text-sm">
 
-                    <div class="flex justify-between gap-4">
-                        <span class="text-gray-500">
-                            Plan
-                        </span>
+                    
+                <div class="flex justify-between gap-4">
+                    <span class="text-gray-500">Plan</span>
+                    <span class="font-medium text-gray-900">
+                        {{ $this->plans[$plan]['name'] }}
+                    </span>
+                </div>
 
-                        <span class="font-medium text-gray-900">
-                            {{ $this->plans[$plan]['name'] }}
-                        </span>
+                <div class="flex justify-between gap-4">
+                    <span class="text-gray-500">Amount</span>
+                    <span class="font-semibold text-gray-900">
+                        M{{ number_format($this->plans[$plan]['amount'], 2) }}
+                    </span>
+                </div>
+
+                <div class="border-t border-gray-200 pt-4 mt-4">
+                    <h3 class="text-sm font-semibold text-gray-900 mb-3">
+                        Payment Details
+                    </h3>
+
+                    {{-- M-Pesa --}}
+                    <div class="rounded-lg border border-gray-200 p-4 mb-3">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="font-semibold text-gray-900">M-Pesa</span>
+                        </div>
+
+                        <div class="text-sm space-y-1">
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Account Name</span>
+                                <span class="font-medium text-gray-900 text-right">
+                                    Your Business Name
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Phone Number</span>
+                                <span class="font-medium text-gray-900">
+                                    Your M-Pesa Number
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex justify-between gap-4">
-                        <span class="text-gray-500">
-                            Amount
-                        </span>
+                    {{-- EcoCash --}}
+                    <div class="rounded-lg border border-gray-200 p-4 mb-3">
+                        <div class="mb-2">
+                            <span class="font-semibold text-gray-900">EcoCash</span>
+                        </div>
 
-                        <span class="font-semibold text-gray-900">
-                            M{{ number_format($this->plans[$plan]['amount'], 2) }}
-                        </span>
+                        <div class="text-sm space-y-1">
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Account Name</span>
+                                <span class="font-medium text-gray-900 text-right">
+                                    Your Business Name
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Phone Number</span>
+                                <span class="font-medium text-gray-900">
+                                    Your EcoCash Number
+                                </span>
+                            </div>
+                        </div>
                     </div>
+
+                    {{-- Bank Transfer --}}
+                    <div class="rounded-lg border border-gray-200 p-4">
+                        <div class="mb-2">
+                            <span class="font-semibold text-gray-900">Bank Transfer</span>
+                        </div>
+
+                        <div class="text-sm space-y-1">
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Bank Name</span>
+                                <span class="font-medium text-gray-900 text-right">
+                                    Your Bank Name
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Account Name</span>
+                                <span class="font-medium text-gray-900 text-right">
+                                    Your Account Name
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Account Number</span>
+                                <span class="font-medium text-gray-900">
+                                    Your Account Number
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between gap-4">
+                                <span class="text-gray-500">Branch</span>
+                                <span class="font-medium text-gray-900">
+                                    Your Branch
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-500 mt-4">
+                    Please use your registered name or subscription details as the payment
+                    reference, and keep your proof of payment for verification.
+                </p>
+
 
                     <div class="flex justify-between gap-4">
                         <span class="text-gray-500">
@@ -411,9 +499,8 @@ class extends \Livewire\Component
                     type="submit"
                     wire:loading.attr="disabled"
                     wire:target="submit"
-                    class="mt-6 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    class="mt-6 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-
                     <span wire:loading.remove wire:target="submit">
                         Submit payment
                     </span>
@@ -421,7 +508,6 @@ class extends \Livewire\Component
                     <span wire:loading wire:target="submit">
                         Submitting...
                     </span>
-
                 </button>
 
             </form>

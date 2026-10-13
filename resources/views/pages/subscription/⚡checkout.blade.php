@@ -360,14 +360,14 @@ class extends \Livewire\Component
                             <div class="flex justify-between gap-4">
                                 <span class="text-gray-500">Account Name</span>
                                 <span class="font-medium text-gray-900 text-right">
-                                    Your Business Name
+                                    Fairview Solutions
                                 </span>
                             </div>
 
                             <div class="flex justify-between gap-4">
-                                <span class="text-gray-500">Phone Number</span>
+                                <span class="text-gray-500">Merchant Code</span>
                                 <span class="font-medium text-gray-900">
-                                    Your M-Pesa Number
+                                    6140
                                 </span>
                             </div>
                         </div>
@@ -383,14 +383,14 @@ class extends \Livewire\Component
                             <div class="flex justify-between gap-4">
                                 <span class="text-gray-500">Account Name</span>
                                 <span class="font-medium text-gray-900 text-right">
-                                    Your Business Name
+                                    Fairview Accounts
                                 </span>
                             </div>
 
                             <div class="flex justify-between gap-4">
-                                <span class="text-gray-500">Phone Number</span>
+                                <span class="text-gray-500">Merchant Code</span>
                                 <span class="font-medium text-gray-900">
-                                    Your EcoCash Number
+                                    41544
                                 </span>
                             </div>
                         </div>
@@ -406,28 +406,28 @@ class extends \Livewire\Component
                             <div class="flex justify-between gap-4">
                                 <span class="text-gray-500">Bank Name</span>
                                 <span class="font-medium text-gray-900 text-right">
-                                    Your Bank Name
+                                    FNB
                                 </span>
                             </div>
 
                             <div class="flex justify-between gap-4">
                                 <span class="text-gray-500">Account Name</span>
                                 <span class="font-medium text-gray-900 text-right">
-                                    Your Account Name
+                                     FAIRVIEW SOLUTIONS
                                 </span>
                             </div>
 
                             <div class="flex justify-between gap-4">
                                 <span class="text-gray-500">Account Number</span>
                                 <span class="font-medium text-gray-900">
-                                    Your Account Number
+                                    63174504275
                                 </span>
                             </div>
 
                             <div class="flex justify-between gap-4">
                                 <span class="text-gray-500">Branch</span>
                                 <span class="font-medium text-gray-900">
-                                    Your Branch
+                                    280061
                                 </span>
                             </div>
                         </div>

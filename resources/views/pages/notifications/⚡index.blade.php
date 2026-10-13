@@ -4,6 +4,14 @@ use Livewire\Component;
 
 new class extends Component
 {
+
+    public function mount()
+    {
+        if (! auth()->user()->hasRole('General Admin')) {
+            $this->redirectRoute('home');
+        }
+    }
+    
     public function getNotificationsProperty()
     {
         return auth()->user()

@@ -31,7 +31,7 @@
             </a>
 
             {{-- Navigation --}}
-<nav class="flex min-w-0 items-center justify-end gap-2 sm:gap-3">
+<nav class="flex min-w-0 items-center justify-end gap-2 sm:gap-3 sticky top-0">
     @auth
         {{-- Desktop navigation --}}
         <div class="hidden min-w-0 items-center gap-1 lg:flex">
@@ -227,37 +227,7 @@
 
             <div class="flex items-center gap-4">
 
-                @auth
-
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
-                        @csrf
-                        <flux:menu.item
-                            as="button"
-                            type="submit"
-                            icon="arrow-right-start-on-rectangle"
-                            class="w-full cursor-pointer"
-                            data-test="logout-button"
-                        >
-                            {{ __('Log out') }}
-                        </flux:menu.item>
-                    </form>
-                @else
-
-                    <a
-                        href="{{ route('login') }}"
-                        class="transition hover:text-zinc-900 dark:hover:text-white"
-                    >
-                        Login
-                    </a>
-
-                    <a
-                        href="{{ route('register') }}"
-                        class="transition hover:text-zinc-900 dark:hover:text-white"
-                    >
-                        Register
-                    </a>
-
-                @endauth
+                <div>Built and Deployed • Penniel Software Solutions</div>
 
             </div>
 

@@ -1,1 +1,1 @@
-<img src="/fav.png" alt="">
+<img src="/fav.png" alt="" {{ $attributes->merge(['class' => 'object-contain']) }}>
